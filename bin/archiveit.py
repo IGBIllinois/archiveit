@@ -85,7 +85,7 @@ if answer.lower() in ['y','yes']:
     #print("chmod 660 on %s" % args.dir+'/'+ntpath.basename(filename))
     #change the mode of the file to 660, again die if you cant do it
     try:
-      os.chmod(args.dir+'/'+ntpath.basename(filename), 0660)
+      os.chmod(args.dir+'/'+ntpath.basename(filename), 660)
     except:
       print("unable to set permissions own archive file %s" % args.dir+'/'+ntpath.basename(filename))
       print("file copied, but permissions not set properly")
