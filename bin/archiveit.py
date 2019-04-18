@@ -6,6 +6,7 @@ import ntpath
 import pwd
 import grp
 import re
+import six
 from shutil import copyfile
 
 parser=argparse.ArgumentParser(description='Copy files to another directory, changing the group name')
@@ -49,7 +50,7 @@ for filename in args.files:
 #ask for confirmation, make sure it is valid
 answer=None
 while answer is None:
-  answer=raw_input("Proceed with copy (y/n)")
+  answer=input("Proceed with copy (y/n)")
   if answer.lower() not in ['y', 'yes','n','no']:
     print("valid answers are y or n, please try again")
     answer=None
