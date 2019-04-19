@@ -2,11 +2,9 @@
 
 import argparse
 import os
-import ntpath
 import pwd
 import grp
 import re
-import six
 from shutil import copyfile
 
 parser=argparse.ArgumentParser(description='Copy files to another directory, changing the group name')
@@ -28,8 +26,8 @@ for filename in args.files:
 
 #check if any of those files exist in destination
 for filename in args.files:
-  if os.path.exists(args.dir+'/'+ntpath.basename(filename)):
-    print("Error:  Filename %s exists in %s" % (ntpath.basename(filename),args.dir))
+  if os.path.exists(args.dir+'/'+os.path.basename(filename)):
+    print("Error:  Filename %s exists in %s" % (os.path.basename(filename),args.dir))
     quit()
 
 #if group is not specified, fetch it from target directory
@@ -61,14 +59,14 @@ if answer.lower() in ['y','yes']:
   for filename in args.files:
     if not re.search('^/', filename):
       filename=os.getcwd()+'/'+filename
-    print("copy %s to %s" % (filename, args.dir+'/'+ntpath.basename(filename)))
+    print("copy %s to %s" % (filename, args.dir+'/'+os.path.basename(filename)))
     #copy file, report if error
     try:
-      copyfile(filename,args.dir+'/'+ntpath.basename(filename))
+      copyfile(filename,args.dir+'/'+os.path.basename(filename))
     except:
       print("Error copyting file")
       quit()
-    #print("chgrp %s on %s" % (group,args.dir+'/'+ntpath.basename(filename)))
+    #print("chgrp %s on %s" % (group,args.dir+'/'+os.path.basename(filename)))
     #get numeric group id to use, die if it does not exist
     try:
       gid = grp.getgrnam(group).gr_gid
@@ -78,18 +76,19 @@ if answer.lower() in ['y','yes']:
       quit()
     #change the file group, die if you cannot (like not having the right permissions)
     try:
-      os.chown(args.dir+'/'+ntpath.basename(filename),-1,gid)
+      os.chown(args.dir+'/'+os.path.basename(filename),-1,gid)
     except:
       print("unable to set group ownership to %s" % gid)
       print("file copied, but permissions not set properly")
       quit()
-    #print("chmod 660 on %s" % args.dir+'/'+ntpath.basename(filename))
+    #print("chmod 660 on %s" % args.dir+'/'+os.path.basename(filename))
     #change the mode of the file to 660, again die if you cant do it
     try:
-      os.chmod(args.dir+'/'+ntpath.basename(filename), 660)
-    except:
-      print("unable to set permissions own archive file %s" % args.dir+'/'+ntpath.basename(filename))
+      os.chmod(args.dir+'/'+os.path.basename(filename), 0o660)
+    except OSError as err:
+      print("unable to set permissions own archive file %s" % args.dir+'/'+os.path.basename(filename))
       print("file copied, but permissions not set properly")
+      print("ERROR: " + format(err))
       quit()
 else:
   print('exiting program')
