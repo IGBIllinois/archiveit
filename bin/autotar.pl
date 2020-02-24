@@ -2,16 +2,38 @@
 
 use strict;
 use warnings;
+use Getopt::Long;
 
-my $sourcedir = '/storage';
-my $destdir = '/archive/CBC/HiSeq';
+
 my $lockfile = "/var/run/autotar";
-my $group = 'biotech-develope';
+my $sourcedir;
+my $destdir;
+my $group;
+my $dryrun;
+
+GetOptions(
+	"h|help"	=> sub { help() },
+	"sourcedir=s"	=> \$sourcedir,
+	"destdir=s"	=> \$destdir,
+	"group=s"	=> \$group,
+	"dry-run"	=> \$dryrun,
+);
+
+unless (defined $sourcedir) {
+	die "Must specify source directory\n";
+}
+unless (defined $destdir) {
+	die "Must specify destination directory\n";
+
+}
+unless (defined $group) {
+	die "Must specify group\n";
+}
 
 if(-e $lockfile){
   die "Autotar appears to be already running or a stale lockfile is present in $lockfile\n";
 }else{
-  open LOCK, ">$lockfile" or die "Cannot creat lock file\n";;
+  open LOCK, ">$lockfile" or die "Cannot create lock file\n";;
   close LOCK;
 }
 
@@ -51,4 +73,16 @@ sub archive {
 		system("mv $source* archived/");
 		system("chgrp $group $sourcedir/archived/*.txt");
 	}
+}
+
+sub help() {
+	print "Usage\n";
+	print "--sourcedir		Source Directory\n";
+	print "--destdir		Destination Directory\n";
+	print "--group			Group to set archive files to\n";
+	print "--dry-run		Output commands only\n";
+	print "--help			This help\n";
+	
+	exit 0;
+
 }
