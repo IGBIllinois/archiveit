@@ -85,8 +85,8 @@ sub help() {
 	print "--destdir		Destination Directory\n";
 	print "--group			Group to set archive files to\n";
 	print "--dry-run		Output commands only\n";
-	print "--help			This help\n";
-	
+	print "-h,--help			This help\n";
+	print "Source Directories must have _ready to be archived\n";	
 	exit 0;
 
 }
