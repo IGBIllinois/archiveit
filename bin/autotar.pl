@@ -5,7 +5,7 @@ use warnings;
 use Getopt::Long;
 
 
-my $lockfile = "/var/run/autotar";
+my $lockfile = "/tmp/autotar";
 my $sourcedir;
 my $destdir;
 my $group;
@@ -30,20 +30,18 @@ unless (defined $group) {
 	die "Must specify group\n";
 }
 
-if (!$dryrun) {
-	if(-e $lockfile) {
-		die "Autotar appears to be already running or a stale lockfile is present in $lockfile\n";
-	}
-	else {
-		open LOCK, ">$lockfile" or die "Cannot create lock file\n";;
-		close LOCK;
-	}
+if(-e $lockfile) {
+	die "Autotar appears to be already running or a stale lockfile is present in $lockfile\n";
+}
+else {
+	open LOCK, ">$lockfile" or die "Cannot create lock file\n";;
+	close LOCK;
 }
 
 chdir($sourcedir) or die "cannot change to $sourcedir\n";
 opendir(DIRECTORY,'.') or die "Cannot open main directory $sourcedir\n";
 foreach my $member (grep !/^\./, readdir DIRECTORY){
-	#print "$member\n";
+	print "$member\n";
 	if($member=~/_ready$/){
 		if(-d $member){
 			print "Archiving $member\n";
