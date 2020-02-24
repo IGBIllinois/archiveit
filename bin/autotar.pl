@@ -9,7 +9,7 @@ my $lockfile = "/var/run/autotar";
 my $sourcedir;
 my $destdir;
 my $group;
-my $dryrun;
+my $dryrun = 0;
 
 GetOptions(
 	"h|help"	=> sub { help() },
@@ -30,24 +30,26 @@ unless (defined $group) {
 	die "Must specify group\n";
 }
 
-if(-e $lockfile){
-  die "Autotar appears to be already running or a stale lockfile is present in $lockfile\n";
-}else{
-  open LOCK, ">$lockfile" or die "Cannot create lock file\n";;
-  close LOCK;
+if (!$dryrun) {
+	if(-e $lockfile) {
+		die "Autotar appears to be already running or a stale lockfile is present in $lockfile\n";
+	}
+	else {
+		open LOCK, ">$lockfile" or die "Cannot create lock file\n";;
+		close LOCK;
+	}
 }
-
 
 chdir($sourcedir) or die "cannot change to $sourcedir\n";
 opendir(DIRECTORY,'.') or die "Cannot open main directory $sourcedir\n";
 foreach my $member (grep !/^\./, readdir DIRECTORY){
-  #print "$member\n";
-  if($member=~/_ready$/){
-    if(-d $member){
-      print "Archiving $member\n";
-      archive($member, $destdir);
-    }
-  }
+	#print "$member\n";
+	if($member=~/_ready$/){
+		if(-d $member){
+			print "Archiving $member\n";
+			archive($member, $destdir);
+		}
+	}
 }
 
 unlink $lockfile or die "Lockfile appears to be removed previously\n";
@@ -60,18 +62,20 @@ sub archive {
 	$destfile="$destfile.tar.bz2";
 	my $cmd = "tar -cjvf $dest/$destfile $source |sed 's/\\/\$//' >$source.tartest.txt";
 	print "$cmd\n";
-	system($cmd);
-	system("find $source -name '*' >$source.findtest.txt");
-	unless(-s "$source.findtest.txt" and -s "$source.tartest.txt") {
-		die "$source.findtest.txt or $source.tartest.txt does not exist or has a zero size\n";
-	}
-	if(`diff $source.tartest.txt $source.findtest.txt`) {
-		die "tar file and directory do not match\n";
-	}
-	else {
-		print "tar file sucessfully verified\n";
-		system("mv $source* archived/");
-		system("chgrp $group $sourcedir/archived/*.txt");
+	if (!$dryrun) {
+		system($cmd);
+		system("find $source -name '*' >$source.findtest.txt");
+		unless(-s "$source.findtest.txt" and -s "$source.tartest.txt") {
+			die "$source.findtest.txt or $source.tartest.txt does not exist or has a zero size\n";
+		}
+		if(`diff $source.tartest.txt $source.findtest.txt`) {
+			die "tar file and directory do not match\n";
+		}
+		else {
+			print "tar file sucessfully verified\n";
+			system("mv $source* archived/");
+			system("chgrp $group $sourcedir/archived/*.txt");
+		}
 	}
 }
 
