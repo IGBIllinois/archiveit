@@ -24,17 +24,17 @@ sub archive {
         my $destfile=$source;
         $destfile=~ s/_ready$//;
         $destfile="$destfile.tar.bz2";
-	my $cmd = "tar -cv $source 2> $source.tartest.txt | pbzip2 -c -p$processors -m$memory > $dest/$destfile";
+	my $cmd = "tar -cv $source 2> $dest/$destfile.files | pbzip2 -c -p$processors -m$memory > $dest/$destfile";
         print timestamp() . " Command: $cmd\n";
         if (!$dryrun) {
                 system($cmd);
-		system("sed -i 's/\\/\$//g' $source.tartest.txt");
+		system("sed -i 's/\\/\$//g' $dest/$destfile.files");
                 system("find $source -name '*' >$source.findtest.txt");
 
-                unless(-s "$source.findtest.txt" and -s "$source.tartest.txt") {
+                unless(-s "$source.findtest.txt" and -s "$dest/$destfile.files") {
                         die timestamp() . " $source.findtest.txt or $source.tartest.txt does not exist or has a zero size\n";
                 }
-                if(`diff $source.tartest.txt $source.findtest.txt`) {
+                if(`diff $dest/$destfile.files $source.findtest.txt`) {
                         die timestamp() . " Tar file and directory do not match\n";
                 }
                 else {
@@ -47,13 +47,13 @@ sub archive {
 
 sub help() {
         print "Usage\n";
-        print "--sourcedir              Source Directory\n";
-        print "--destdir                Destination Directory\n";
-        print "--group                  Group to set archive files to\n";
+        print "--sourcedir		Source Directory\n";
+        print "--destdir		Destination Directory\n";
+        print "--group			Group to set archive files to\n";
 	print "-p,--processors		Number of Processors (Default 1)\n";
 	print "-m,--memory		Amount of memory to use in MB (Default 100MB)\n";
-        print "--dry-run                Output commands only\n";
-        print "-h,--help                        This help\n";
+        print "--dry-run		Output commands only\n";
+        print "-h,--help		This help\n";
         print "Source Directories must have _ready to be archived\n";
         exit 0;
 
