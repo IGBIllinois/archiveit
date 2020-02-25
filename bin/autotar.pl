@@ -41,7 +41,9 @@ sub archive {
                         print timestamp() . " Tar file sucessfully verified\n";
                         system("mv $source* archived/");
                         system("chgrp $group $sourcedir/archived/*.txt");
-			system("sha256sum $dest/$destfile > $$dest/$destfile.sha256sum");
+			my $sha256cmd = "sha256sum $dest/$destfile > $dest/$destfile.sha256sum";
+			print timestamp() . " Command: $sha256cmd\n";
+			system($sha256cmd);
                 }
         }
 }
@@ -82,19 +84,17 @@ unless (defined $group) {
 	die "Must specify group\n";
 }
 
-if(-e $sourcedir and -d $sourcedir) { }
-else {
+if(! -e $sourcedir or ! -d $sourcedir) {
 	die "Source Directory $sourcedir does not exist\n";
 }
-if(-e $destdir and -d $destdir ) {}
-else {
-	die "Destination Directory $destdir does not exist\n"
-}
-if(-e "$sourcedir/archived" and -d "$sourcedir/archived" ) {}
-else {
-	die "Archived directory in source directory does not exist\n";
+
+if(! -e $destdir or ! -d $destdir ) {
+	die "Destination Directory $destdir does not exist\n";
 }
 
+if(! -e "$sourcedir/archived" or ! -d "$sourcedir/archived" ) {
+	die "Archived directory in source directory does not exist\n";
+}
 if(-e $lockfile) {
 	die "Autotar appears to be already running or a stale lockfile is present in $lockfile\n";
 }
@@ -115,5 +115,4 @@ foreach my $member (grep !/^\./, readdir DIRECTORY){
 }
 
 unlink $lockfile or die "Lockfile appears to be removed previously\n";
-
 
