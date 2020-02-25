@@ -3,6 +3,9 @@ Active Archive Scripts
 * Saves data to the Active Archive system [https://help.igb.illinois.edu/Active_Archive]
 * Automatically compresses the directories
 
+## Requirements
+* tar
+* pbzip2
 
 ## autotar.pl
 * Used to archive HiSeq runs
