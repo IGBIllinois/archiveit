@@ -32,7 +32,7 @@ sub archive {
                 system("find $source -name '*' >$source.findtest.txt");
 
                 unless(-s "$source.findtest.txt" and -s "$dest/$destfile.files") {
-                        die timestamp() . " $source.findtest.txt or $source.tartest.txt does not exist or has a zero size\n";
+                        die timestamp() . " $source.findtest.txt or $destfile.files does not exist or has a zero size\n";
                 }
                 if(`diff $dest/$destfile.files $source.findtest.txt`) {
                         die timestamp() . " Tar file and directory do not match\n";
@@ -41,6 +41,7 @@ sub archive {
                         print timestamp() . " Tar file sucessfully verified\n";
                         system("mv $source* archived/");
                         system("chgrp $group $sourcedir/archived/*.txt");
+			system("sha256sum $dest/$destfile > $$dest/$destfile.sha256sum");
                 }
         }
 }
@@ -81,6 +82,18 @@ unless (defined $group) {
 	die "Must specify group\n";
 }
 
+if(-e $sourcedir and -d $sourcedir) { }
+else {
+	die "Source Directory $sourcedir does not exist\n";
+}
+if(-e $destdir and -d $destdir ) {}
+else {
+	die "Destination Directory $destdir does not exist\n"
+}
+if(-e "$sourcedir/archived" and -d "$sourcedir/archived" ) {}
+else {
+	die "Archived directory in source directory does not exist\n";
+}
 
 if(-e $lockfile) {
 	die "Autotar appears to be already running or a stale lockfile is present in $lockfile\n";
@@ -93,7 +106,6 @@ else {
 chdir($sourcedir) or die "Cannot change to $sourcedir\n";
 opendir(DIRECTORY,'.') or die "Cannot open main directory $sourcedir\n";
 foreach my $member (grep !/^\./, readdir DIRECTORY){
-	print "$member\n";
 	if($member=~/_ready$/){
 		if(-d $member){
 			print timestamp() . " Archiving $member\n";

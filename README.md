@@ -21,6 +21,12 @@ Usage
 -h,--help		This help
 Source Directories must have _ready to be archived
 ```
+* This will create 3 files. 
+```
+DIRECTORYNAME.tar.bz2
+DIRECTORYNAME.tar.bz2.files
+DIRECTORYNAME.tar.bz2.sha256sum
+```
 
 ## miseq_archive.pl
 * Used to archive MiSeqs runs
