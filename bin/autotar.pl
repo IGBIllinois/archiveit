@@ -40,10 +40,15 @@ sub archive {
                 else {
                         print timestamp() . " Tar file sucessfully verified\n";
                         system("mv $source* archived/");
-                        system("chgrp $group $sourcedir/archived/*.txt");
+			
+			#created sha256 checksum
 			my $sha256cmd = "sha256sum $dest/$destfile > $dest/$destfile.sha256sum";
 			print timestamp() . " Command: $sha256cmd\n";
 			system($sha256cmd);
+			#chgrp the files
+			system("chgrp $group $dest/$destfile");
+			system("chgrp $group $dest/$destfile.files");
+			system("chgrp $group $dest/$destfile.sha256sum");
                 }
         }
 }
