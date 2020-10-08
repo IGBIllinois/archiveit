@@ -1,4 +1,7 @@
 # archiveit
+
+[![Build Status](https://www.travis-ci.com/IGBIllinois/archiveit.svg?branch=master)](https://www.travis-ci.com/IGBIllinois/archiveit)
+
 Active Archive Scripts
 * Saves data to the Active Archive system [https://help.igb.illinois.edu/Active_Archive]
 * Automatically compresses the directories
