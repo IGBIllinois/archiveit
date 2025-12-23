@@ -1,6 +1,6 @@
 # archiveit
 
-[![Build Status](https://www.travis-ci.com/IGBIllinois/archiveit.svg?branch=master)](https://www.travis-ci.com/IGBIllinois/archiveit)
+[![Build Status](https://github.com/IGBIllinois/archiveit/actions/workflows/main.yml/badge.svg)](https://github.com/IGBIllinois/archiveit/actions/workflows/main.yml)
 
 Active Archive Scripts
 * Saves data to the Active Archive system [https://help.igb.illinois.edu/Active_Archive]
